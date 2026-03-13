@@ -1,16 +1,19 @@
 from transformers import pipeline
 
-# Load once (important for Streamlit performance)
+# Use text2text-generation instead of summarization
 summarizer = pipeline(
-    "summarization",
-    model="facebook/bart-large-cnn"
+    "text2text-generation",
+    model="google/flan-t5-base"
 )
 
-def summarize_text(text, max_length=150, min_length=40):
+def summarize_text(text, max_length=150):
+
+    prompt = "summarize: " + text
+
     summary = summarizer(
-        text,
+        prompt,
         max_length=max_length,
-        min_length=min_length,
         do_sample=False
     )
-    return summary[0]['summary_text']
+
+    return summary[0]["generated_text"]
