@@ -1,5 +1,6 @@
 streamlit
-torch
 transformers
+torch
 pdfplumber
 pillow
+sentencepiece
