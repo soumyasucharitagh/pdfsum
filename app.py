@@ -1,66 +1,107 @@
 import streamlit as st
 from PIL import Image
 
-from models.text_summarizer import summarize_text
-from models.pdf_summarizer import summarize_pdf
-from models.image_captioning import generate_caption
+# Import functions from your modules
+from text_summarizer import summarize_text
+from pdf_summarizer import summarize_pdf
+from image_captioning import generate_caption
 
-st.set_page_config(page_title="ML Multi App", layout="wide")
 
-st.title("🧠 Multi-Model ML Application")
-
-option = st.sidebar.selectbox(
-    "Choose a task",
-    ["Text Summarization", "PDF Summarization", "Image Captioning"]
+# Streamlit Page Config
+st.set_page_config(
+    page_title="AI Summarizer & Caption Generator",
+    page_icon="🤖",
+    layout="wide"
 )
 
-# ================= TEXT =================
+st.title("📄 AI Text / PDF Summarizer + 🖼 Image Caption Generator")
+st.write("Upload text, PDF, or images to generate summaries and captions using AI.")
+
+# Sidebar selection
+option = st.sidebar.selectbox(
+    "Choose Function",
+    [
+        "Text Summarization",
+        "PDF Summarization",
+        "Image Captioning"
+    ]
+)
+
+
+# ===============================
+# TEXT SUMMARIZATION
+# ===============================
 if option == "Text Summarization":
+
     st.header("📝 Text Summarization")
 
-    text = st.text_area("Enter text", height=250)
-
-    if st.button("Summarize"):
-        if text.strip():
-            with st.spinner("Summarizing..."):
-                summary = summarize_text(text)
-            st.subheader("Summary")
-            st.write(summary)
-        else:
-            st.warning("Please enter some text.")
-
-# ================= PDF =================
-elif option == "PDF Summarization":
-    st.header("📄 PDF Summarization")
-
-    uploaded_pdf = st.file_uploader(
-        "Upload a PDF", type=["pdf"]
+    text_input = st.text_area(
+        "Enter your text here",
+        height=300
     )
 
-    if st.button("Summarize PDF"):
-        if uploaded_pdf:
-            with st.spinner("Processing PDF..."):
-                summary = summarize_pdf(uploaded_pdf)
-            st.subheader("Summary")
-            st.write(summary)
+    if st.button("Generate Summary"):
+
+        if text_input.strip() == "":
+            st.warning("Please enter some text.")
         else:
-            st.warning("Please upload a PDF file.")
+            with st.spinner("Generating summary..."):
+                summary = summarize_text(text_input)
 
-# ================= IMAGE =================
+            st.subheader("Summary")
+            st.success(summary)
+
+
+# ===============================
+# PDF SUMMARIZATION
+# ===============================
+elif option == "PDF Summarization":
+
+    st.header("📄 PDF Summarization")
+
+    pdf_file = st.file_uploader(
+        "Upload PDF file",
+        type=["pdf"]
+    )
+
+    if pdf_file is not None:
+
+        if st.button("Summarize PDF"):
+
+            with st.spinner("Extracting and summarizing..."):
+                summary = summarize_pdf(pdf_file)
+
+            st.subheader("Summary")
+            st.success(summary)
+
+
+# ===============================
+# IMAGE CAPTIONING
+# ===============================
 elif option == "Image Captioning":
-    st.header("🖼 Image Captioning")
 
-    uploaded_image = st.file_uploader(
-        "Upload an image",
+    st.header("🖼 Image Caption Generator")
+
+    image_file = st.file_uploader(
+        "Upload Image",
         type=["jpg", "jpeg", "png"]
     )
 
-    if uploaded_image:
-        image = Image.open(uploaded_image).convert("RGB")
+    if image_file is not None:
+
+        image = Image.open(image_file)
+
         st.image(image, caption="Uploaded Image", use_column_width=True)
 
         if st.button("Generate Caption"):
+
             with st.spinner("Generating caption..."):
                 caption = generate_caption(image)
+
             st.subheader("Caption")
-            st.write(caption)
+            st.success(caption)
+
+
+# Footer
+st.markdown("---")
+st.markdown("Built with 🤖 Transformers + Streamlit")
