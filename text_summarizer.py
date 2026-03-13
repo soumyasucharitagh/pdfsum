@@ -1,19 +1,16 @@
 from transformers import pipeline
 
-# Use text2text-generation instead of summarization
 summarizer = pipeline(
-    "text2text-generation",
-    model="google/flan-t5-base"
+    "summarization",
+    model="facebook/bart-large-cnn"
 )
 
-def summarize_text(text, max_length=150):
-
-    prompt = "summarize: " + text
-
+def summarize_text(text, max_length=150, min_length=40):
     summary = summarizer(
-        prompt,
+        text,
         max_length=max_length,
+        min_length=min_length,
         do_sample=False
     )
 
-    return summary[0]["generated_text"]
+    return summary[0]["summary_text"]
